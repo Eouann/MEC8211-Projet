@@ -8,16 +8,16 @@ import numpy as np
 
 
 #Erreur L1 discrète
-def ErreurL1(Ti,Ti_exact,N):
+def ErreurL1(Ti,Ti_exact,N_spatial,N_temporel):
     """Fonction de calcul de l'erreur L1 discrète"""
-    normeL1 = 1/N*np.sum(np.abs(Ti-Ti_exact))
+    normeL1 = 1/(N_spatial*N_temporel)*np.sum(np.abs(Ti-Ti_exact))
     return normeL1
 
 
 #Erreur L2 discrète
-def ErreurL2(Ti,Ti_exact,N):
+def ErreurL2(Ti,Ti_exact,N_spatial,N_temporel):
     """Fonction de calcul de l'erreur L2 discrète"""
-    normeL2 = np.sqrt(1/N*np.sum(np.abs(Ti-Ti_exact)**2))
+    normeL2 = np.sqrt(1/(N_spatial*N_temporel)*np.sum(np.abs(Ti-Ti_exact)**2))
     return normeL2
 
 
