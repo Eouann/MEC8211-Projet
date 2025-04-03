@@ -1,20 +1,22 @@
 """
-Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope
+Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
+d'Euler implicite.
 """
 
 
 # Importation des bibliothèques
 import numpy as np
 import matplotlib.pyplot as plt
+import config
 
 
 # Définition des constantes
-alpha=0.3e-6        # m²/s (matière réfractaire)
-e=0.1               # m (épaisseur du mur du four)
-T_0=20+273          # K (température initiale du mur)
-T_x_0=1600+273      # K (température de la flamme du four)
-T_x_e=20+273        # K (température de l'air ambiant dans l'atelier)
-t_max=3600          # s (durée de la simulation)
+alpha=config.alpha
+e=config.e
+T_0=config.T_0
+T_x_0=config.T_x_0
+T_x_e=config.T_x_e
+t_max=config.t_max
 
 
 # Calcul des températures pour N points
@@ -47,7 +49,6 @@ def Concentrations(N_spatial,N_temporel):
         matA[i,i+1] = -alpha*delta_t                # Coeff B devant T_i+1
     
     for i in range(len(t_i)):
-        t=t_i[i]
         for j in range(1, N_spatial - 1):
             vectB[j] = T_i[j]*delta_x**2
 
