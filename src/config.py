@@ -3,9 +3,7 @@ Fichier de configuration des constantes
 """
 
 
-###########################
 # Définition des constantes
-###########################
 alpha=0.3e-6        # m²/s (matière réfractaire)
 e=0.1               # m (épaisseur du mur du four)
 T_0=20+273          # K (température initiale du mur)
