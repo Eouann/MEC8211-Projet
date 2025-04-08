@@ -48,7 +48,8 @@ def Concentrations(N_spatial,N_temporel):
         matA[i,i] = delta_x**2+2*alpha*delta_t      # Coeff A devant T_i
         matA[i,i+1] = -alpha*delta_t                # Coeff B devant T_i+1
     
-    for i in range(len(t_i)):
+    T_i_n[0] = T_i
+    for i in range(1,len(t_i)):
         for j in range(1, N_spatial - 1):
             vectB[j] = T_i[j]*delta_x**2
 
