@@ -24,15 +24,14 @@ def Concentrations(N_spatial):
     N_temporel = int(N_temporel)
     
     T_i = np.ones(N_spatial) * T_0  # Température initiale
+
     T_i_n = np.zeros((N_temporel, N_spatial))  # Stockage des températures
     
     x_i = np.linspace(0,e,N_spatial)
     t_i = np.linspace(0, t_max, N_temporel)
     
     T_i_n[0,:] = T_i
-
-
-    
+ 
     # Simulation temporelle
     for n in range(0, N_temporel - 1):
         T_next = T_i.copy()
@@ -50,18 +49,22 @@ def Concentrations(N_spatial):
     
     return T_i_n, x_i, t_i
 
+# Temps à afficher (en secondes)
+temps_affiches = [0, 900, 1800, 2700, 3600]
+
 # Lancement de la simulation
 N_spatial = 100
 T_i_n, x_i, t_i = Concentrations(N_spatial)
 
-# Affichage des résultats
-plt.plot(x_i, T_i_n[10], label='t=0s')
-plt.plot(x_i, T_i_n[125], label='t=900s')
-plt.plot(x_i, T_i_n[250], label='t=1800s')
-plt.plot(x_i, T_i_n[375], label='t=2700s')
-plt.plot(x_i, T_i_n[499], label='t=3600s')
+# Tracé
+plt.figure()
+for t in temps_affiches:
+    idx = np.argmin(np.abs(t_i - t))  # Trouver l'index le plus proche du temps voulu
+    plt.plot(x_i, T_i_n[idx], label=f't={t}s')
+
 plt.title("Simulation de diffusion thermique au travers d'un matériau isotrope")
 plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
+
