@@ -20,7 +20,7 @@ t_max=config.t_max
 
 
 # Calcul des températures pour N points
-def Concentrations(N_spatial,N_temporel):
+def Temperatures(N_spatial,N_temporel):
     """Fonction de calcul des N températures en différences finies"""
     T_i = np.ones(N_spatial)*T_0                # Vecteur des N températures numériques calculées T_i
     T_i_n = np.zeros((N_temporel,N_spatial))    # Matrice des N températures numériques calculées T_i pour chaque itération
@@ -63,7 +63,7 @@ def Concentrations(N_spatial,N_temporel):
 # Lancement de la simulation
 N_spatial=100
 N_temporel=100
-T_i_n,x_i,t_i = Concentrations(N_spatial,N_temporel)
+T_i_n,x_i,t_i = Temperatures(N_spatial,N_temporel)
 
 
 # Affichage des résultats
