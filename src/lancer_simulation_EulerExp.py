@@ -1,4 +1,7 @@
-
+"""
+Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
+d'Euler explicite.
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,22 +16,21 @@ T_x_e = config.T_x_e
 t_max = config.t_max
 
 # Calcul des températures pour N points
-
-def Concentrations(N_spatial):
+def Temperatures(N_spatial):
     """Méthode d'ordre 2 en espace et Euler explicite en temps"""
     
-    delta_x = e / (N_spatial - 1)
-    #delta_t = 1.71
+    delta_x = e / (N_spatial - 1) #Définition du temps spatial
+    #delta_t = 1.71 #Cas de convergence avec bruit à 3600 secondes 
     delta_t = 0.4 * delta_x**2 / alpha  # Condition CFL pour stabilité
     N_temporel = 3600/delta_t
-    N_temporel = int(N_temporel)
+    N_temporel = int(N_temporel) #Pour implémenter la taille de la liste
     
     T_i = np.ones(N_spatial) * T_0  # Température initiale
 
     T_i_n = np.zeros((N_temporel, N_spatial))  # Stockage des températures
     
-    x_i = np.linspace(0,e,N_spatial)
-    t_i = np.linspace(0, t_max, N_temporel)
+    x_i = np.linspace(0, e, N_spatial) #Liste des pas spatiaux
+    t_i = np.linspace(0, t_max, N_temporel) #Liste des pas temporels
     
     T_i_n[0,:] = T_i
  
@@ -54,7 +56,7 @@ temps_affiches = [0, 900, 1800, 2700, 3600]
 
 # Lancement de la simulation
 N_spatial = 100
-T_i_n, x_i, t_i = Concentrations(N_spatial)
+T_i_n, x_i, t_i = Temperatures(N_spatial)
 
 # Tracé
 plt.figure()

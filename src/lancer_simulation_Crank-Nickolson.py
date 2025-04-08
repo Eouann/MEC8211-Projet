@@ -1,16 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Apr  8 10:09:20 2025
-
-@author: cedcrx
+Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
+de Crank-Nickolson
 """
 
+# Importation des bibliothèques
 import numpy as np
 import matplotlib.pyplot as plt
 import config
 
-# Constantes
+#Définition des constantes
 alpha = config.alpha
 e = config.e
 T_0 = config.T_0
@@ -18,12 +16,13 @@ T_x_0 = config.T_x_0
 T_x_e = config.T_x_e
 t_max = config.t_max
 
-def crank_nicolson(N_spatial):
-    delta_x = e / (N_spatial - 1)
-    delta_t = 10# pour rester raisonnable (même si CN est stable)
+# Calcul des températures pour N points
+def Temperature_Crank_Nickolson(N_spatial):
+    delta_x = e / (N_spatial - 1)  #Définition du temps spatial
+    delta_t = 2  # Pas de discrétisation temporelle
     N_temporel = int(t_max / delta_t)
     
-    r = alpha * delta_t / (delta_x ** 2)
+    r = alpha * delta_t / (delta_x ** 2) 
 
     # Vecteurs et matrices
     T = np.ones(N_spatial) * T_0
@@ -36,6 +35,7 @@ def crank_nicolson(N_spatial):
     A = np.zeros((N_spatial, N_spatial))
     B = np.zeros((N_spatial, N_spatial))
     
+    # Algorithmes differences finies
     for i in range(1, N_spatial-1):
         A[i, i-1] = -r/2
         A[i, i]   = 1 + r
@@ -66,7 +66,7 @@ temps_affiches = [0, 900, 1800, 2700, 3600]
 
 # Résolution Crank-Nicolson
 N_spatial = 100
-T_i_n, x_i, t_i = crank_nicolson(N_spatial)
+T_i_n, x_i, t_i = Temperature_Crank_Nickolson(N_spatial)
 
 # Affichage
 plt.figure()
