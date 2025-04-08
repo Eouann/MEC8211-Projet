@@ -22,7 +22,7 @@ def Concentrations(N_spatial, N_temporel):
     vectB = np.zeros(N_spatial)
 
     delta_x = e / (N_spatial - 1)
-    delta_t = 1E-3
+    delta_t = 1E-1
     x_i = np.linspace(0, e, N_spatial)
     t_i = np.linspace(0, t_max, N_temporel)
     coeff = alpha * delta_t / delta_x**2

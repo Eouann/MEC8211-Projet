@@ -1,4 +1,5 @@
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 import config
@@ -13,17 +14,19 @@ t_max = config.t_max
 
 # Calcul des températures pour N points
 
-def Concentrations(N_spatial, N_temporel):
+def Concentrations(N_spatial):
     """Méthode d'ordre 2 en espace et Euler explicite en temps"""
+    
+    delta_x = e / (N_spatial - 1)
+    #delta_t = 1.71
+    delta_t = 0.4 * delta_x**2 / alpha  # Condition CFL pour stabilité
+    N_temporel = 3600/delta_t
+    N_temporel = int(N_temporel)
+    
     T_i = np.ones(N_spatial) * T_0  # Température initiale
     T_i_n = np.zeros((N_temporel, N_spatial))  # Stockage des températures
     
-    delta_x = e / (N_spatial - 1)
-    #delta_t = 1.8
-    delta_t = 0.4 * delta_x**2 / alpha  # Condition CFL pour stabilité
-    print(delta_t)
-    
-    x_i = np.linspace(0, e, N_spatial)
+    x_i = np.linspace(0,e,N_spatial)
     t_i = np.linspace(0, t_max, N_temporel)
     
     T_i_n[0,:] = T_i
@@ -49,8 +52,7 @@ def Concentrations(N_spatial, N_temporel):
 
 # Lancement de la simulation
 N_spatial = 100
-N_temporel = 500  # Ajusté pour stabilité
-T_i_n, x_i, t_i = Concentrations(N_spatial, N_temporel)
+T_i_n, x_i, t_i = Concentrations(N_spatial)
 
 # Affichage des résultats
 plt.plot(x_i, T_i_n[10], label='t=0s')
