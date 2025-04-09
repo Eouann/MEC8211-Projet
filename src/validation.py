@@ -59,7 +59,17 @@ def calc_u_input(incertitude_T_ext,incertitude_T_four,incertitude_alpha):
     mean_result = np.mean(results)
     std_result = np.std(results)
 
-    return mean_result, std_result
+    return std_result
+
+
+# Définition de la fonction u_D de calcul de l'incertitude de mesure
+def calc_u_D(T_exp,incertitude_ThermoCouple):
+    """Fonction de calcul de u_D, l'incertitude de mesure"""
+    # Calcul de l'écart-type des mesures expérimentales
+    std_exp = np.std(T_exp)
+    # Calcul de l'incertitude de mesure
+    u_D = np.sqrt(incertitude_ThermoCouple**2+std_exp**2)
+    return u_D
 
 
 # Résultats de simulations pour u_num
@@ -69,10 +79,17 @@ liste_dx = np.array([])
 liste_T = np.array([]) # f_r^2.h, f_r.h, f_h
 p_f = 2
 
+
 # Définition des incertitudes à propager
 incertitude_T_ext = 1       # En K
 incertitude_T_four = 5      # En K
 incertitude_alpha = 0.02e-6 # En m²/s
+
+
+# Définition des resultas expérimentaux
+T_exp = np.array([]) # Liste des resultats expérimentaux
+incertitude_ThermoCouple = 0.5 # En K
+
 '''
 # Importation des données
 T_simu = np.array([])       # Listes de resultats de simulations
@@ -80,7 +97,7 @@ S = np.mean(T_simu)         # Valeur moyenne des simulations
 D = XXX                     # Valeur moyenne des mesures expérimentales
 u_num = calc_u_num(liste_T,r,p_f) # Incertitude numérique
 u_input = calc_u_input(incertitude_T_ext,incertitude_T_four,incertitude_alpha)  # Incertitude des parametres d'entrée
-u_D = XXX                   # Incertitude des mesures experimentales
+u_D = calc_u_D(T_exp,incertitude_ThermoCouple)                   # Incertitude des mesures experimentales
 k = 2                       # Car u_num a ete déterminé grace au GCI
 
 

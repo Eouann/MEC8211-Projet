@@ -13,10 +13,13 @@ import config
 # Définition des constantes
 alpha=config.alpha
 e=config.e
+cp=config.cp
+rho=config.rho
 T_0=config.T_0
 T_x_0=config.T_x_0
 T_x_e=config.T_x_e
 t_max=config.t_max
+h=config.h
 
 
 # Calcul des températures pour N points
@@ -37,10 +40,10 @@ def Temperatures(N_spatial,N_temporel):
     matA[0,0] = 1
     vectB[0] = T_x_0
 
-    # Condition de Dirichlet en x = e
-    matA[-1,-1] = 1
-    vectB[-1] = T_x_e
-
+    # Condition de Robin en x = e
+    matA[-1, -1] = 1+delta_x * h / (alpha*rho*cp)
+    matA[-1, -2] = -1
+    vectB[-1] = h * delta_x * T_x_e / (alpha*rho*cp)
 
     # Algorithmes differences finies
     for i in range(1,N_spatial-1):
@@ -49,7 +52,7 @@ def Temperatures(N_spatial,N_temporel):
         matA[i,i+1] = -alpha*delta_t                # Coeff B devant T_i+1
     
     T_i_n[0] = T_i
-    for i in range(1,len(t_i)):
+    for i in range(1,N_temporel):
         for j in range(1, N_spatial - 1):
             vectB[j] = T_i[j]*delta_x**2
 
