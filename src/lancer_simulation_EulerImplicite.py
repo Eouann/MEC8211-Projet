@@ -17,7 +17,7 @@ cp=config.cp
 rho=config.rho
 T_0=config.T_0
 T_x_0=config.T_x_0
-T_x_e=config.T_x_e
+T_x_inf=config.T_x_inf
 t_max=config.t_max
 h=config.h
 
@@ -40,7 +40,7 @@ def Temperatures(N_spatial,N_temporel):
     matA[0,0] = 1
     vectB[0] = T_x_0
 
-    # Condition de Robin en x = e
+    # Condition de Robin en x = e (Différentiation d'ordre 1)
     matA[-1, -1] = 1+delta_x * h / (alpha*rho*cp)
     matA[-1, -2] = -1
     vectB[-1] = h * delta_x * T_x_e / (alpha*rho*cp)
@@ -80,3 +80,8 @@ plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
+
+retour=np.zeros([N_temporel,2])
+retour[:,0]=t_i
+retour[:,1]=T_i_n[:,-1]
+print(retour)

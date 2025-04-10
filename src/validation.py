@@ -12,12 +12,15 @@ from lancer_simulation_EulerImplicite import Temperatures
 
 
 # Définition des constantes
-alpha = config.alpha
-e = config.e
-T_0 = config.T_0
-T_x_0 = config.T_x_0
-T_x_e = config.T_x_e
-t_max = config.t_max
+alpha=config.alpha
+e=config.e
+cp=config.cp
+rho=config.rho
+T_0=config.T_0
+T_x_0=config.T_x_0
+T_x_inf=config.T_x_inf
+t_max=config.t_max
+h=config.h
 
 
 # Définition de la fonction u_num

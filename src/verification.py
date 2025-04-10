@@ -8,12 +8,15 @@ import matplotlib.pyplot as plt
 import config 
 
 # Importation des constantes
-alpha = config.alpha        # m²/s (matière réfractaire)
-e = config.e                # m (épaisseur du mur du four)
-T_0 = config.T_0            # K (température initiale du mur)
-T_x_0 = config.T_x_0        # K (température de la flamme du four)
-T_x_e = config.T_x_e        # K (température de l'air ambiant dans l'atelier)
-t_max = config.t_max        # s (durée de la simulation)
+alpha=config.alpha
+e=config.e
+cp=config.cp
+rho=config.rho
+T_0=config.T_0
+T_x_0=config.T_x_0
+T_x_inf=config.T_x_inf
+t_max=config.t_max
+h=config.h
 
 # === Discrétisation ===
 Nx = 100          # points d'espace
