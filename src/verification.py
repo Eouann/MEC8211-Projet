@@ -23,7 +23,7 @@ t_max = config.t_max        # s (durée de la simulation)
 x,t = sp.symbols('x t')
 
 # Solution MMS
-T_MMS = T_0 + (T_x_0 - T_0) * np.exp(-h*x /k) * (1 - np.exp(- t /t_max))
+T_MMS = T_0 + (T_x_0 - T_x_inf) * sp.exp(-h*x /k) * (1 - sp.exp(- t /t_max))
 
 # Transformation de la solution manufacturée sympy en fonction traçable par matplotlib
 f_T_MMS = sp.lambdify([x,t], T_MMS, modules=['numpy'])
@@ -32,7 +32,7 @@ f_T_MMS = sp.lambdify([x,t], T_MMS, modules=['numpy'])
 def terme_source (x,t) :
     terme1 = 1/t_max * np.exp(-t/t_max)
     terme2 = alpha * (h/k)**2 * (1 - np.exp(- t /t_max))
-    facteur = (T_x_0 - T_0) * np.exp(-h*x/k)
+    facteur = (T_x_0 - T_x_inf) * np.exp(-h*x/k)
     return facteur * (terme1 - terme2)
 
 # Tracé de la Solution MMS
@@ -40,7 +40,7 @@ x_values = np.linspace (0,e,500)
 plt.figure()
 
 for t in ([0, t_max/4, t_max/2, t_max]):
-    y_values = T_MMS(x_values,t)
+    y_values = f_T_MMS(x_values,t)
     plt.plot(x_values, y_values, label=f't={t} s')
     
 plt.title("Solution manufacturée fonction de x à différents instants")
@@ -48,7 +48,7 @@ plt.xlabel('x (m)')
 plt.ylabel('Solution manufacturée')
 plt.legend()
 plt.grid()
-plt.savefig('Projet/results/solution_manufacturée.png')
+plt.savefig('solution_manufacturée.png')
 plt.show()
 
 # Tracé du Terme Source  
@@ -65,5 +65,5 @@ plt.xlabel('x (m)')
 plt.ylabel('Terme source')
 plt.legend()
 plt.grid()
-plt.savefig('Projet/results/terme_source.png')
+plt.savefig('terme_source.png')
 plt.show()
