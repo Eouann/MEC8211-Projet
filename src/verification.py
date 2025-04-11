@@ -8,12 +8,15 @@ import matplotlib.pyplot as plt
 import config 
 
 # Importation des constantes
-alpha = config.alpha        # m²/s (matière réfractaire)
-e = config.e                # m (épaisseur du mur du four)
-T_0 = config.T_0            # K (température initiale du mur)
-T_x_0 = config.T_x_0        # K (température de la flamme du four)
-T_x_e = config.T_x_e        # K (température de l'air ambiant dans l'atelier)
-t_max = config.t_max        # s (durée de la simulation)
+alpha=config.alpha
+e=config.e
+cp=config.cp
+rho=config.rho
+T_0=config.T_0
+T_x_0=config.T_x_0
+T_x_inf=config.T_x_inf
+t_max=config.t_max
+h=config.h
 
 # === Discrétisation ===
 Nx = 100          # points d'espace
@@ -26,14 +29,14 @@ t = np.linspace(0, t_max, Nt+1)
 
 # Définition de la solution exacte MMS 
 def T_exact (x,t):
-    return T_0 + (T_x_0 - T_x_e) * (1 - x/e)**2 * (1 - np.exp(- t /t_max))
+    return T_0 + (T_x_0 - T_x_inf) * (1 - x/e)**2 * (1 - np.exp(- t /t_max))
 
 
 # === Terme source MMS ===
 def source(x, t):
     term1 = (1 - x/e)**2 * 1/t_max * np.exp(- t / t_max)
     term2 = -2 * alpha / e**2 * (1 - np.exp(- t / t_max))
-    return (T_x_0 - T_x_e) * (term1 + term2)
+    return (T_x_0 - T_x_inf) * (term1 + term2)
 
 # === Matrice Crank-Nicolson ===
 r = alpha * dt / (dx**2)
@@ -68,7 +71,7 @@ for n in range(1, Nt+1):
 
     # Imposer CLs :
     b[0] = T_x_0
-    b[-1] = T_x_e
+    b[-1] = T_x_inf
     A[0, :] = 0
     A[-1, :] = 0
     A[0, 0] = 1

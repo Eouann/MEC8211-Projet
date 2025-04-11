@@ -13,14 +13,17 @@ import config
 # Définition des constantes
 alpha=config.alpha
 e=config.e
+cp=config.cp
+rho=config.rho
 T_0=config.T_0
 T_x_0=config.T_x_0
-T_x_e=config.T_x_e
+T_x_inf=config.T_x_inf
 t_max=config.t_max
+h=config.h
 
 
 # Calcul des températures pour N points
-def Temperatures(N_spatial,N_temporel):
+def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=alpha,rho=rho,cp=cp,h=h):
     """Fonction de calcul des N températures en différences finies"""
     T_i = np.ones(N_spatial)*T_0                # Vecteur des N températures numériques calculées T_i
     T_i_n = np.zeros((N_temporel,N_spatial))    # Matrice des N températures numériques calculées T_i pour chaque itération
@@ -37,10 +40,10 @@ def Temperatures(N_spatial,N_temporel):
     matA[0,0] = 1
     vectB[0] = T_x_0
 
-    # Condition de Dirichlet en x = e
-    matA[-1,-1] = 1
-    vectB[-1] = T_x_e
-
+    # Condition de Robin en x = e (Différentiation d'ordre 1)
+    matA[-1, -1] = 1+delta_x * h / (alpha*rho*cp)
+    matA[-1, -2] = -1
+    vectB[-1] = h * delta_x * T_x_inf / (alpha*rho*cp)
 
     # Algorithmes differences finies
     for i in range(1,N_spatial-1):
@@ -49,7 +52,7 @@ def Temperatures(N_spatial,N_temporel):
         matA[i,i+1] = -alpha*delta_t                # Coeff B devant T_i+1
     
     T_i_n[0] = T_i
-    for i in range(1,len(t_i)):
+    for i in range(1,N_temporel):
         for j in range(1, N_spatial - 1):
             vectB[j] = T_i[j]*delta_x**2
 
@@ -77,3 +80,10 @@ plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
+
+'''
+res=np.zeros((N_temporel,2))
+res[:,0]=t_i
+res[:,1]=T_i_n[:,-1]
+print(res)
+'''
