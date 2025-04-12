@@ -48,39 +48,28 @@ def Temperatures_Explicite(N_spatial,N_temporel):
 
 
 # --- Simulation ---
+
+temps_affiches = [0, 900, 1800, 2700, 3600]
+
+# Lancement de la simulation
 N_spatial = 100
 N_temporel = 3600
-
 T_i_n, x_i, t_i = Temperatures_Explicite(N_spatial,N_temporel)
 
-# --- Affichage ---
-plt.plot(x_i, T_i_n[0], label='t = 0 s')
-plt.plot(x_i, T_i_n[300], label='t ≈ 900 s')
-plt.plot(x_i, T_i_n[600], label='t ≈ 1800 s')
-plt.plot(x_i, T_i_n[900], label='t ≈ 2700 s')
-plt.plot(x_i, T_i_n[-1], label='t = 3600 s')
-plt.title("Diffusion thermique (Euler explicite + Robin)")
-plt.xlabel("Position x (m)")
-plt.ylabel("Température T (K)")
-plt.legend()
-plt.grid(True)
-plt.show()
+# Affichage des résultats
+plt.plot(x_i, T_i_n[10], label='t=0s')
+plt.plot(x_i, T_i_n[125], label='t=900s')
+plt.plot(x_i, T_i_n[250], label='t=1800s')
+plt.plot(x_i, T_i_n[375], label='t=2700s')
+plt.plot(x_i, T_i_n[499], label='t=3600s')
+# Tracé
+plt.figure()
+for t in temps_affiches:
+    idx = np.argmin(np.abs(t_i - t))  # Trouver l'index le plus proche du temps voulu
+    plt.plot(x_i, T_i_n[idx], label=f't={t}s')
 
-"""def T_exact(x, t):
-    return T_0 + (T_x_0 - T_0) * (x / e) * np.exp(-alpha * np.pi**2 * t / e**2)
-
-# Création du vecteur de positions x
-x_i = np.linspace(0, e, 100)
-
-# Calcul de la température pour t = 3600
-t=3600
-T_values = T_exact(x_i, t)
-
-# Tracé de la solution
-plt.plot(x_i, T_values, label=f"T(x,t) à t={t}s")
+plt.title("Simulation de diffusion thermique au travers d'un matériau isotrope")
 plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
-plt.title("Profil de température T(x,t) à t = 3600s")
 plt.legend()
-plt.grid(True)
-plt.show()"""
+plt.show()
