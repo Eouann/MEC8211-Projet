@@ -5,91 +5,65 @@ Fichier de vérification du modèle numérique de diffusion thermique
 # Importation des bibliothèques
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy as sp
 import config 
 
 # Importation des constantes
-alpha=config.alpha
-e=config.e
-cp=config.cp
-rho=config.rho
-T_0=config.T_0
-T_x_0=config.T_x_0
-T_x_inf=config.T_x_inf
-t_max=config.t_max
-h=config.h
+alpha = config.alpha        # m²/s (matière réfractaire)
+e = config.e                # m (épaisseur du mur du four)
+cp = config.cp              # J/(kg.K) (capacité thermique massique de la matière réfractaire)
+rho = config.rho            # kg/m³ (masse volumique de la matière réfractaire)
+h = config.h                # W/m2.K (coefficient de transfert thermique convectif)
+k = alpha * rho * cp                 #   (conductivité thermique de l'isolant)
+T_0 = config.T_0            # K (température initiale du mur)
+T_x_0 = config.T_x_0        # K (température de la flamme du four)
+T_x_inf = config.T_x_inf    # K (température de l'air ambiant dans l'atelier)
+t_max = config.t_max        # s (durée de la simulation)
 
-# === Discrétisation ===
-Nx = 100          # points d'espace
-Nt = 500          # pas de temps
-x = np.linspace(0, e, Nx)
-dx = x[1] - x[0]
-dt = t_max / Nt
-t = np.linspace(0, t_max, Nt+1)
+x,t = sp.symbols('x t')
 
+# Solution MMS
+T_MMS = T_0 + (T_x_0 - T_x_inf) * sp.exp(-h*x /k) * (1 - sp.exp(- t /t_max))
 
-# Définition de la solution exacte MMS 
-def T_exact (x,t):
-    return T_0 + (T_x_0 - T_x_inf) * (1 - x/e)**2 * (1 - np.exp(- t /t_max))
+# Transformation de la solution manufacturée sympy en fonction traçable par matplotlib
+f_T_MMS = sp.lambdify([x,t], T_MMS, modules=['numpy'])
 
+# Terme Source
+def terme_source (x,t) :
+    terme1 = 1/t_max * np.exp(-t/t_max)
+    terme2 = alpha * (h/k)**2 * (1 - np.exp(- t /t_max))
+    facteur = (T_x_0 - T_x_inf) * np.exp(-h*x/k)
+    return facteur * (terme1 - terme2)
 
-# === Terme source MMS ===
-def source(x, t):
-    term1 = (1 - x/e)**2 * 1/t_max * np.exp(- t / t_max)
-    term2 = -2 * alpha / e**2 * (1 - np.exp(- t / t_max))
-    return (T_x_0 - T_x_inf) * (term1 + term2)
+# Tracé de la Solution MMS
+x_values = np.linspace (0,e,500)
+plt.figure()
 
-# === Matrice Crank-Nicolson ===
-r = alpha * dt / (dx**2)
-A = np.zeros((Nx, Nx))
-B = np.zeros((Nx, Nx))
-
-for i in range(1, Nx-1):
-    A[i, i-1] = -r / 2
-    A[i, i]   = 1 + r
-    A[i, i+1] = -r / 2
-    B[i, i-1] = r / 2
-    B[i, i]   = 1 - r
-    B[i, i+1] = r / 2
-
-# Conditions de Dirichlet : T(0,t)=1600, T(e,t)=20
-A[0, 0] = A[-1, -1] = 1
-B[0, 0] = B[-1, -1] = 1
-
-# === Initialisation ===
-Tn = np.ones(Nx) * 20  # T(x,0) = 20
-T_all = [Tn.copy()]
-
-# === Boucle en temps ===
-for n in range(1, Nt+1):
-    tn = t[n]
-    tn1 = t[n-1]
-
-    S_n = source(x, tn)
-    S_n1 = source(x, tn1)
-
-    b = B @ Tn + 0.5 * dt * (S_n + S_n1)
-
-    # Imposer CLs :
-    b[0] = T_x_0
-    b[-1] = T_x_inf
-    A[0, :] = 0
-    A[-1, :] = 0
-    A[0, 0] = 1
-    A[-1, -1] = 1
-
-    # Résolution du système linéaire
-    Tn1 = np.linalg.solve(A, b)
-    T_all.append(Tn1.copy())
-    Tn = Tn1
-
-# === Affichage ===
-plt.figure(figsize=(10,6))
-for i in [0, int(Nt/4), int(Nt/2), Nt]:
-    plt.plot(x, T_all[i], label=f't = {t[i]:.2f}')
-plt.plot(x, T_exact(x, t[-1]), 'k--', label='T exact (final)')
-plt.xlabel("x")
-plt.ylabel("T(x,t)")
-plt.title("Équation de la chaleur avec solution MMS (Crank-Nicolson)")
+for t in ([0, t_max/4, t_max/2, t_max]):
+    y_values = f_T_MMS(x_values,t)
+    plt.plot(x_values, y_values, label=f't={t} s')
+    
+plt.title("Solution manufacturée fonction de x à différents instants")
+plt.xlabel('x (m)')
+plt.ylabel('Solution manufacturée')
 plt.legend()
 plt.grid()
+plt.savefig('solution_manufacturée.png')
+plt.show()
+
+# Tracé du Terme Source  
+plt.figure()
+
+for t in ([0, t_max/4, t_max/2, t_max]):
+    S_values = np.zeros(len(x_values))
+    for i in range(len(x_values)):
+        S_values[i] = terme_source(x_values[i],t)
+    plt.plot(x_values, S_values, label=f't={t} s')
+
+plt.title("Terme source en fonction de x à différents instants")
+plt.xlabel('x (m)')
+plt.ylabel('Terme source')
+plt.legend()
+plt.grid()
+plt.savefig('terme_source.png')
 plt.show()

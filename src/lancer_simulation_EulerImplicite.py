@@ -60,14 +60,13 @@ def Temperatures(N_spatial,N_temporel):
         T_i = np.linalg.solve(matA, vectB)
         T_i_n[i] = T_i
 
-    return T_i_n,x_i,t_i
+    return T_i_n
 
-
+'''
 # Lancement de la simulation
 N_spatial=100
 N_temporel=100
 T_i_n,x_i,t_i = Temperatures(N_spatial,N_temporel)
-
 
 # Affichage des résultats
 plt.plot(x_i,T_i_n[0],label='t=0s')
@@ -81,7 +80,6 @@ plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
 
-'''
 res=np.zeros((N_temporel,2))
 res[:,0]=t_i
 res[:,1]=T_i_n[:,-1]
