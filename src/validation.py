@@ -6,6 +6,7 @@ Fichier de validation du modèle numérique de diffusion thermique
 # Importation des bibliothèques
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import linregress
 import config
 from lancer_simulation_EulerImplicite import Temperatures
 
@@ -56,7 +57,7 @@ def calc_u_input(incertitude_T_ext,incertitude_T_four,incertitude_alpha,incertit
     u_Xi[5] = incertitude_h
 
     # Calcul de l'incertitude des paramètres d'entrée
-    print((S_Xi*u_Xi)**2)
+    print("S_Xi : ",S_Xi)
     u_input = np.sqrt(np.sum((S_Xi*u_Xi)**2))
     return u_input
 
@@ -73,7 +74,7 @@ def calc_u_D(T_exp,incertitude_ThermoCouple):
 
 # Résultats de simulations pour u_num
 r = 2 # Choisi arbitrairement
-p_f = 2 # Ordre de convergence du schéma
+p_f = 1 # Ordre de convergence du schéma temporel
 list_N_temporel = np.zeros(3)
 liste_delta_t = np.array([18*r*r,18*r,18])
 liste_T = np.zeros(3) # Dans l'ordre f_r^2.h, f_r.h, f_h
@@ -92,7 +93,7 @@ incertitude_h = 1.5         # En W/(m².K)
 
 
 # Définition des resultas expérimentaux
-T_exp = np.array([389.692516,386.0857023,386.4554338,390.1501201,388.372952,386.7105072,390.3668001,385.498271,391.1243893,384.4701009]) # Liste des resultats expérimentaux
+T_exp = np.array([320.8568087,323.3207646,315.8538349,322.2963,325.6347422,323.3933496,316.7395012,324.2282505,322.6564081,317.5701481]) # Liste des resultats expérimentaux
 incertitude_ThermoCouple = 0.5 # En K
 
 
@@ -114,18 +115,49 @@ def Calcul_E(S,D):
 
 # Execution du calcul
 E=Calcul_E(S,D)
-print("La valeur de E est : ",E)
 
 
 # Calcul de u_val, l'incertitude de validation
-def Calcul_u_val(u_num,u_input,u_D):
+def calc_u_val(u_num,u_input,u_D):
     """Fonction de calcul de u_val l'incertitude de validation"""
     u_val = np.sqrt(u_num**2+u_input**2+u_D**2)
     return u_val
 
 
 # Intervalle de delta_model
-intervalle_sup=E+k*Calcul_u_val(u_num,u_input,u_D)
-intervalle_inf=E-k*Calcul_u_val(u_num,u_input,u_D)
+intervalle_sup=E+k*calc_u_val(u_num,u_input,u_D)
+intervalle_inf=E-k*calc_u_val(u_num,u_input,u_D)
 
+
+# Graphique de convergence asymptotique
+liste_delta_t_conv_asymp = np.array([300,200,100,72,50,36,30,20,18,10,5,2])
+liste_T_conv_asymp = np.zeros(len(liste_delta_t_conv_asymp))
+for i in range(len(liste_T_conv_asymp)):
+    N_temporel = int(t_max/liste_delta_t_conv_asymp[i])
+    liste_T_conv_asymp[i] = Temperatures(N_temporel=int(N_temporel))[-1,-1]
+liste_T_normalisé = (liste_T_conv_asymp[-1]-liste_T_conv_asymp)/liste_T_conv_asymp[-1] # Normalisation des températures pour la convergence asymptotique
+
+plt.plot(liste_delta_t_conv_asymp,liste_T_normalisé,'o', color='red')
+slope, intercept, r_value, p_value, std_err = linregress(np.log(liste_delta_t_conv_asymp[:-1]), np.log(liste_T_normalisé[:-1]))
+y_pred =  np.exp(intercept) * liste_delta_t_conv_asymp[:-1]**slope
+plt.plot(liste_delta_t_conv_asymp[:-1], y_pred, '--', color='red', label=f'Ordre de convergence : {slope}')
+plt.xlabel('Delta t [s]')
+plt.ylabel('Température [K]')
+plt.title('Vérification de la convergence asymptotique')
+plt.legend()
+plt.xscale('log')
+plt.yscale('log')
+plt.grid()
+plt.savefig('results/validation-analyse-de-convergence-asymptotique.png')
+plt.show()
+
+
+# Affichage des résultats
+print("La valeur de S est : ",S)
+print("La valeur de D est : ",D)
+print("La valeur de E est : ",E)
+print("L'incertitude numérique est : ",u_num)
+print("L'incertitude d'entrée est : ",u_input)
+print("L'incertitude de mesure est : ",u_D)
+print("La valeur de u_val est : ",calc_u_val(u_num,u_input,u_D))
 print("Delta_model, l'erreur du modèle se trouve dans l'intervalle [",intervalle_inf,";",intervalle_sup,"] avec une confiance de 95,4 %")

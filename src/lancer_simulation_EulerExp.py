@@ -1,63 +1,67 @@
-"""
-Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
-d'Euler explicite.
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import config
 
 # Définition des constantes
-alpha = config.alpha
-e = config.e
-T_0 = config.T_0
-T_x_0 = config.T_x_0
-T_x_e = config.T_x_e
-t_max = config.t_max
+alpha=config.alpha
+e=config.e
+cp=config.cp
+rho=config.rho
+T_0=config.T_0
+T_x_0=config.T_x_0
+T_x_inf=config.T_x_inf
+t_max=config.t_max
+h=config.h
+k = alpha * rho * cp  # Conductivité thermique
 
-# Calcul des températures pour N points
-def Temperatures(N_spatial):
-    """Méthode d'ordre 2 en espace et Euler explicite en temps"""
+#N_temporel doit etre superieur a 3600
+def Temperatures_Explicite(N_spatial,N_temporel):
+    delta_x = e / (N_spatial - 1)
+    delta_t = t_max/(N_temporel-1)
     
-    delta_x = e / (N_spatial - 1) #Définition du temps spatial
-    #delta_t = 1.71 #Cas de convergence avec bruit à 3600 secondes 
-    delta_t = 0.4 * delta_x**2 / alpha  # Condition CFL pour stabilité
-    N_temporel = 3600/delta_t
-    N_temporel = int(N_temporel) #Pour implémenter la taille de la liste
-    
-    T_i = np.ones(N_spatial) * T_0  # Température initiale
 
-    T_i_n = np.zeros((N_temporel, N_spatial))  # Stockage des températures
-    
-    x_i = np.linspace(0, e, N_spatial) #Liste des pas spatiaux
-    t_i = np.linspace(0, t_max, N_temporel) #Liste des pas temporels
-    
-    T_i_n[0,:] = T_i
- 
-    # Simulation temporelle
-    for n in range(0, N_temporel - 1):
+    x_i = np.linspace(0, e, N_spatial)
+    t_i = np.linspace(0, t_max, N_temporel)
+
+    T_i = np.ones(N_spatial) * T_0
+    T_i_n = np.zeros((N_temporel, N_spatial))
+    T_i_n[0] = T_i.copy()
+
+    lambda_ = alpha * delta_t / delta_x**2
+
+    for n in range(N_temporel - 1):
         T_next = T_i.copy()
         
-        # Schéma d'ordre 2 en espace
+        # Intérieur du domaine
         for i in range(1, N_spatial - 1):
-            T_next[i] = T_i[i] + alpha * delta_t / delta_x**2 * (T_i[i-1] - 2*T_i[i] + T_i[i+1])
-        
-        # Conditions aux bords (Dirichlet)
+            T_next[i] = T_i[i] + lambda_ * (T_i[i-1] - 2*T_i[i] + T_i[i+1])
+
+        # Bord gauche : Dirichlet
         T_next[0] = T_x_0
-        T_next[-1] = T_x_e
-        
+
+        # Bord droit : Robin (flux -> interpolation directe)
+        T_next[-1] = (k * T_i[-2]/delta_x + h * T_x_inf) / (k/delta_x + h)
         T_i = T_next.copy()
         T_i_n[n+1] = T_i
-    
+
     return T_i_n, x_i, t_i
 
-# Temps à afficher (en secondes)
+
+# --- Simulation ---
+
 temps_affiches = [0, 900, 1800, 2700, 3600]
 
 # Lancement de la simulation
 N_spatial = 100
-T_i_n, x_i, t_i = Temperatures(N_spatial)
+N_temporel = 3600
+T_i_n, x_i, t_i = Temperatures_Explicite(N_spatial,N_temporel)
 
+# Affichage des résultats
+plt.plot(x_i, T_i_n[10], label='t=0s')
+plt.plot(x_i, T_i_n[125], label='t=900s')
+plt.plot(x_i, T_i_n[250], label='t=1800s')
+plt.plot(x_i, T_i_n[375], label='t=2700s')
+plt.plot(x_i, T_i_n[499], label='t=3600s')
 # Tracé
 plt.figure()
 for t in temps_affiches:
@@ -69,4 +73,3 @@ plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
-
