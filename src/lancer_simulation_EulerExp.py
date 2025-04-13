@@ -49,7 +49,7 @@ def Temperatures_Explicite(N_spatial,N_temporel):
 
 # --- Simulation ---
 
-temps_affiches = [0, 900, 1800, 2700, 3600]
+temps_affiches = [ 900, 1800, 2700, 3600]
 
 # Lancement de la simulation
 N_spatial = 100
