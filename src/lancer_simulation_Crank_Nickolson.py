@@ -1,8 +1,7 @@
 """
 Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
-d'Euler implicite.
+de Crank-Nickolson
 """
-
 
 # Importation des bibliothèques
 import numpy as np
@@ -37,64 +36,60 @@ T_all = np.vstack([
     Result_Comsol.T_2700,
     Result_Comsol.T_3600
 ])
-
 # Calcul des températures pour N points
-def Temperatures(N_spatial,N_temporel):
-    """Fonction de calcul des N températures en différences finies"""
-    T_i = np.ones(N_spatial)*T_0                # Vecteur des N températures numériques calculées T_i
-    T_i_n = np.zeros((N_temporel,N_spatial))    # Matrice des N températures numériques calculées T_i pour chaque itération
-    matA = np.zeros((N_spatial,N_spatial))      # Matrice A pour la résolution du système matriciel
-    vectB = np.zeros(N_spatial)                 # Vecteur B pour la résolution du système matriciel
-
-    delta_x=e/(N_spatial-1)                     # Pas de discrétisation
-    x_i=np.linspace(0, e, N_spatial)            # Vecteur des N points r_i également espacées
-
+def Temperature_Crank_Nickolson(N_spatial,N_temporel):
+    delta_x = e / (N_spatial - 1)
     delta_t=t_max/N_temporel                    # Pas de discrétisation temporelle
-    t_i=np.linspace(0, t_max, N_temporel)       # Vecteur des N points t_i également espacées
+    t_i=np.linspace(0, t_max, N_temporel)
 
-    # Condition de Dirichlet en x = 0
-    matA[0,0] = 1
-    vectB[0] = T_x_0
+    r = alpha * delta_t / (delta_x ** 2)
+    k = alpha * rho * cp  # Conductivité thermique effective
 
-    # Condition de Robin en x = e (Différentiation d'ordre 1)
-    matA[-1, -1] = 1+delta_x * h / (alpha*rho*cp)
-    matA[-1, -2] = -1
-    vectB[-1] = h * delta_x * T_x_inf / (alpha*rho*cp)
+    # Vecteurs et matrices
+    T = np.ones(N_spatial) * T_0
+    T[0] = T_x_0
 
-    # Algorithmes differences finies
-    for i in range(1,N_spatial-1):
-        matA[i,i-1] = -alpha*delta_t                # Coeff B devant T_i-1
-        matA[i,i] = delta_x**2+2*alpha*delta_t      # Coeff A devant T_i
-        matA[i,i+1] = -alpha*delta_t                # Coeff B devant T_i+1
+    T_record = np.zeros((N_temporel, N_spatial))
+    T_record[0, :] = T
+
+    A = np.zeros((N_spatial, N_spatial))
+    B = np.zeros((N_spatial, N_spatial))
+
+    # Construction des matrices A et B
+    for i in range(1, N_spatial - 1):
+        A[i, i - 1] = -r / 2
+        A[i, i] = 1 + r
+        A[i, i + 1] = -r / 2
+
+        B[i, i - 1] = r / 2
+        B[i, i] = 1 - r
+        B[i, i + 1] = r / 2
+
+    # Condition de Dirichlet à gauche (x=0)
+    A[0, 0] = 1
+    B[0, 0] = 1
+
+    # Condition de Robin à droite (x=e)
+    coef_robin = (k / delta_x) + h
+    A[-1, -2] = -k / delta_x
+    A[-1, -1] = coef_robin
+    B[-1, -2] = k / delta_x
+    B[-1, -1] = coef_robin
+
+    for n in range(0, N_temporel - 1):
+        b = B @ T
+
+        # Imposer les conditions aux limites
+        b[0] = T_x_0  # Dirichlet
+        b[-1] = h * T_x_inf  # Robin (second membre de l'équation)
+
+        T = np.linalg.solve(A, b)
+        T_record[n + 1, :] = T
+
+    x_i = np.linspace(0, e, N_spatial)
+    t_i = np.linspace(0, t_max, N_temporel)
     
-    T_i_n[0] = T_i
-    for i in range(1,N_temporel):
-        for j in range(1, N_spatial - 1):
-            vectB[j] = T_i[j]*delta_x**2
-
-        # Résolution du système matriciel
-        T_i = np.linalg.solve(matA, vectB)
-        T_i_n[i] = T_i
-    
-    return T_i_n , x_i, t_i
-
-"""
-# Lancement de la simulation
-N_spatial=100
-N_temporel=100
-T_i_n,x_i,t_i = Temperatures(N_spatial,N_temporel)
-
-# Affichage des résultats
-plt.plot(x_i,T_i_n[25],label='t=900s')
-plt.plot(x_i,T_i_n[50],label='t=1800s')
-plt.plot(x_i,T_i_n[75],label='t=2700s')
-plt.plot(x_i,T_i_n[99],label='t=3600s')
-plt.title("Simulation de diffusion thermique au travers d'un matériau isotrope")
-plt.xlabel('Position x (m)')
-plt.ylabel('Température T (K)')
-plt.legend()
-plt.show()
-"""
+    return T_record, x_i, t_i
 
 # Choix des paramètres de discrétisation
 N_spatial = 16       # Doit être > len(x_points) pour interpolation précise
@@ -102,7 +97,7 @@ N_temporel = 100  # Doit être > 3600 pour respecter ta condition
 
 def Result(N_spatial,N_temporel):
     # Appel de la fonction de simulation
-    T_i_n, x_sim, t_sim = Temperatures(N_spatial, N_temporel)
+    T_i_n, x_sim, t_sim = Temperature_Crank_Nickolson(N_spatial, N_temporel)
     
     # Points où on veut extraire les températures (fixés par l'utilisateur)
     x_points = np.array([
@@ -129,10 +124,9 @@ def Result(N_spatial,N_temporel):
     T_selected = T_interpolated[target_indices, :]
 
     return(T_selected)
-    
 
 def erreur_spatial(N_temporel, T_all):
-    N_Spatiaux = [100,200,400]
+    N_Spatiaux = [100,200]
     E = []
     delta_x = []
     for N_Sp in N_Spatiaux:
@@ -143,7 +137,7 @@ def erreur_spatial(N_temporel, T_all):
     return(E,delta_x)
 
 def erreur_temporelle(N_spatial, T_all):
-    N_temporels = [200,400,800]
+    N_temporels = [400,800]
     E = []
     delta_t = []
     for N_Tp in N_temporels:
@@ -215,14 +209,4 @@ plot_erreur_spatial(N_temporel, T_all)
 
 N_spatial = 100  # Exemple de paramètre spatial
 plot_erreur_temporelle(N_spatial, T_all)
-
-
-        
-        
-
-
-
-
-
-
 
