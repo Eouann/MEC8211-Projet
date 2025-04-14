@@ -50,7 +50,7 @@ plt.xlabel('x (m)')
 plt.ylabel('Solution manufacturée')
 plt.legend()
 plt.grid()
-plt.savefig('solution_manufacturée.png')
+plt.savefig('results/solution_manufacturée.png')
 plt.show()
 
 # Tracé du Terme Source  
@@ -67,10 +67,10 @@ plt.xlabel('x (m)')
 plt.ylabel('Terme source')
 plt.legend()
 plt.grid()
-plt.savefig('terme_source.png')
+plt.savefig('results/terme_source.png')
 plt.show()
 
-# Analyse de convergence spatiale avec delta temporel fixé à 3,1536e7 s (1 an)
+# Analyse de convergence spatiale et temporelle
 def Temperatures(N_spatial, N_temporel):
    """Fonction de calcul des N températures en différences finies avec terme source MMS"""
    T_i = np.ones(N_spatial) * T_0                  # Vecteur des N températures numériques calculées T_i
@@ -132,7 +132,7 @@ plt.title("Simulation de diffusion thermique au travers d'un matériau isotrope"
 plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
-plt.savefig('simulation diff.png')
+plt.savefig('results/simulation diff.png')
 plt.show()
 
 
@@ -178,7 +178,7 @@ plt.ylabel('Erreur')
 plt.legend()
 plt.grid(True)
 plt.title("Étude de l’ordre de convergence temporel")
-plt.savefig('erreurs.png')
+plt.savefig('results/erreurs.png')
 plt.show()
 pente = np.polyfit(np.log(delta_t_liste), np.log(err_L1), 1)
 print("Ordre de convergence estimé (L1) :", pente[0])
