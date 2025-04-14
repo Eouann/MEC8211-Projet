@@ -46,16 +46,34 @@ def Temperatures_Explicite(N_spatial,N_temporel):
 
     return T_i_n, x_i, t_i
 
+# Choix des paramètres de discrétisation
+N_spatial = 16       
+N_temporel = 4   
 
+# Appel de la fonction de simulation
+T_i_n, x_sim, t_sim = Temperatures_Explicite(N_spatial, N_temporel)
+
+# Points où on veut extraire les températures (fixés par l'utilisateur)
+x_points = np.array([
+    0.0, 0.006666666666666667, 0.013333333333333334, 0.020000000000000004,
+    0.026666666666666672, 0.03333333333333335, 0.040000000000000015,
+    0.04666666666666669, 0.05333333333333336, 0.06000000000000003,
+    0.06666666666666671, 0.07333333333333339, 0.08000000000000007,
+    0.08666666666666674, 0.09333333333333342, 0.1
+])
+
+
+
+""""
 # --- Simulation ---
 
-temps_affiches = [0, 900, 1800, 2700, 3600]
+temps_affiches = [ 900, 1800, 2700, 3600]
 
 # Lancement de la simulation
 N_spatial = 100
 N_temporel = 3600
 T_i_n, x_i, t_i = Temperatures_Explicite(N_spatial,N_temporel)
-
+print(T_i_n[-1])
 # Affichage des résultats
 plt.plot(x_i, T_i_n[10], label='t=0s')
 plt.plot(x_i, T_i_n[125], label='t=900s')
@@ -73,3 +91,4 @@ plt.xlabel('Position x (m)')
 plt.ylabel('Température T (K)')
 plt.legend()
 plt.show()
+"""

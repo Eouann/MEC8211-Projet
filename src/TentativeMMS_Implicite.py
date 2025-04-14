@@ -121,24 +121,58 @@ def Erreur_Temporel():
         diff_totale2 = np.sqrt((1/(N_temp*N_spatial))*np.sum((T_num - T_ana)**2))
         erreurs_L1.append(diff_totale)
         erreurs_L2.append(diff_totale2)
-        
-        print(erreurs_L1)
-        
-        
+
     
     return(erreurs_L1,erreurs_L2,delta_t_liste)
 
-        
-err_L1, err_L2, delta_t_liste = Erreur_Temporel()
+def Erreur_Spatial():
+    """Étude de l'erreur en fonction du nombre de points temporels (résolution temporelle)"""
+    erreurs_L1, erreurs_L2, taille_maillage = [], [], []
+    N_temporel = 100 #On fixe le pas spatial
+    N_spatial_list = [2000, 2500] # Prise du nombre de point temporel a étudier
+    delta_x_liste = [t_max / (i-1) for i in N_spatial_list]
 
-plt.loglog(delta_t_liste, err_L1, 'o-', label="Erreur L1")
-plt.loglog(delta_t_liste, err_L2, 's-', label="Erreur L2")
-plt.loglog(delta_t_liste, [err_L1[0]*(dt/delta_t_liste[0]) for dt in delta_t_liste], '--', label='Ordre 1')
-plt.xlabel('Delta t')
-plt.ylabel('Erreur')
+    for N_spa in N_spatial_list:
+        T_num, x_i, t_i = Temperatures(N_spa, N_temporel) #Calcul des valeurs de la MMS ainsi que des listes de pas
+        T_ana = Calcul_Matrice_Terme_Exact(x_i,t_i)
+        diff_totale = (1/(N_temporel*N_spa))*np.sum(np.abs(T_num - T_ana))
+        diff_totale2 = np.sqrt((1/(N_temporel*N_spa))*np.sum((T_num - T_ana)**2))
+        erreurs_L1.append(diff_totale)
+        erreurs_L2.append(diff_totale2)
+
+    
+    return(erreurs_L1,erreurs_L2,delta_x_liste)
+
+
+
+from scipy.stats import linregress
+import matplotlib.pyplot as plt
+
+# Appel de la fonction
+erreurs_L1, erreurs_L2, delta_x_liste = Erreur_Spatial()
+
+# Passage en log
+log_dx = np.log(delta_x_liste)
+log_err = np.log(erreurs_L1)
+
+# Régression linéaire
+slope, intercept, r_value, p_value, std_err = linregress(log_dx, log_err)
+
+# Récupération de C et p
+p = slope
+C = np.exp(intercept)
+
+# Affichage
+print(f"Loi puissance approchante : Erreur ≈ {C:.3e} * Δx^{p:.3f}")
+print(f"Coefficient de corrélation R² : {r_value**2:.5f}")
+
+# Tracé de la courbe avec la loi puissance ajustée
+plt.figure(figsize=(8,6))
+plt.loglog(delta_x_liste, erreurs_L1, 'o-', label='Erreur L1')
+plt.loglog(delta_x_liste, C * np.array(delta_x_liste)**p, '--', label=f'Fit: {C:.1e} * Δx^{p:.2f}')
+plt.xlabel('Δx (taille du pas spatial)')
+plt.ylabel('Erreur L1')
+plt.title('Erreur L1 vs Δx avec approximation en loi puissance')
+plt.grid(True, which="both", ls="--")
 plt.legend()
-plt.grid(True)
-plt.title("Étude de l’ordre de convergence temporel")
 plt.show()
-pente = np.polyfit(np.log(delta_t_liste), np.log(err_L1), 1)
-print("Ordre de convergence estimé (L1) :", pente[0])
