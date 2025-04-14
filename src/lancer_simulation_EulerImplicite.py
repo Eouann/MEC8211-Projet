@@ -23,7 +23,7 @@ h=config.h
 
 
 # Calcul des températures pour N points
-def Temperatures(N_spatial,N_temporel):
+def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=alpha,rho=rho,cp=cp,h=h):
     """Fonction de calcul des N températures en différences finies"""
     T_i = np.ones(N_spatial)*T_0                # Vecteur des N températures numériques calculées T_i
     T_i_n = np.zeros((N_temporel,N_spatial))    # Matrice des N températures numériques calculées T_i pour chaque itération
