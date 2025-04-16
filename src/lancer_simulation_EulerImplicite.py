@@ -9,8 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import config
 import Result_Comsol
-from erreurs import ErreurL1, ErreurL2
-
 
 
 # Définition des constantes
@@ -47,10 +45,10 @@ def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=
     vectB = np.zeros(N_spatial)                 # Vecteur B pour la résolution du système matriciel
 
     delta_x=e/(N_spatial-1)                     # Pas de discrétisation
-    x_i=np.linspace(0, e, N_spatial)            # Vecteur des N points r_i également espacées
+           # Vecteur des N points r_i également espacées
 
     delta_t=t_max/N_temporel                    # Pas de discrétisation temporelle
-    t_i=np.linspace(0, t_max, N_temporel)       # Vecteur des N points t_i également espacées
+      # Vecteur des N points t_i également espacées
 
     # Condition de Dirichlet en x = 0
     matA[0,0] = 1
