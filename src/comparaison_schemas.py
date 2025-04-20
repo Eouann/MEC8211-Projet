@@ -1,4 +1,9 @@
+"""
+Fichier de comparaison des différentes schémas de différence finie codés
+"""
 
+
+#Importation de bibliothèques
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -88,5 +93,3 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
-
-

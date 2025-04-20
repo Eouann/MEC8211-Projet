@@ -1,3 +1,10 @@
+"""
+Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
+d'Euler explicite
+"""
+
+
+# Importation des bibliothèques
 import numpy as np
 import matplotlib.pyplot as plt
 import config

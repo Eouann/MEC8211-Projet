@@ -1,9 +1,10 @@
-"""Comparaison Comsol simulation et Python"""
+"""
+Comparaison Comsol et Python
+"""
 
-"T = 900"
+
 # Importation des bibliothèques
 import numpy as np 
-
 import matplotlib.pyplot as plt
 import config
 

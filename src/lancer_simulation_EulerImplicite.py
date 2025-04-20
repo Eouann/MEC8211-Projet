@@ -1,6 +1,6 @@
 """
 Fichier de lancement de simulation de diffusion thermique au travers d'un matériau isotrope avec la méthode
-d'Euler implicite.
+d'Euler implicite
 """
 
 
