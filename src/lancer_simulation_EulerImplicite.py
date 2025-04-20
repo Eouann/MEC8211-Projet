@@ -60,4 +60,4 @@ def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=
         T_i = np.linalg.solve(matA, vectB)
         T_i_n[i] = T_i
     
-    return T_i_n 
+    return T_i_n

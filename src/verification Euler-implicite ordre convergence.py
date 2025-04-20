@@ -1,5 +1,5 @@
 """
-Fichier de vÃ©rification par MMS
+Fichier de vÃ©rification du modÃ¨le numÃ©rique de diffusion thermique par MMS
 """
 
 
@@ -44,7 +44,7 @@ f_source = sp.lambdify([t, x], source, "numpy")
 
 # Calcul des tempÃ©ratures pour N points
 def Temperatures(N_spatial, N_temporel, T_x_0=T_x_0, T_x_inf=T_x_inf, alpha=alpha, rho=rho, cp=cp, h=h):
-    """Fonction de calcul des tempŽratures en diffŽrences finies avec terme source"""
+    """Fonction de calcul des tempï¿½ratures en diffï¿½rences finies avec terme source"""
     T_i = np.ones(N_spatial) * T_0
     T_i_n = np.zeros((N_temporel, N_spatial))
     matA = np.zeros((N_spatial, N_spatial))
@@ -73,14 +73,14 @@ def Temperatures(N_spatial, N_temporel, T_x_0=T_x_0, T_x_inf=T_x_inf, alpha=alph
     T_i_n[0] = T_i
 
     for n in range(1, N_temporel):
-        # Mise ˆ jour de vectB pour la condition de Dirichlet en x = 0
+        # Mise ï¿½ jour de vectB pour la condition de Dirichlet en x = 0
         vectB[0] = T_0 + T_x_0 * (1 - np.exp(-t_i[n] / t_max))
         
         for j in range(1, N_spatial - 1):
             S = f_source(t_i[n], x_i[j])  # Terme source
             vectB[j] = T_i[j] * delta_x ** 2 + delta_t * delta_x ** 2 * S  # Ajout du terme source
         
-        # La condition de Robin est dŽjˆ gŽrŽe hors de la boucle
+        # La condition de Robin est dï¿½jï¿½ gï¿½rï¿½e hors de la boucle
         T_i = np.linalg.solve(matA, vectB)
         T_i_n[n] = T_i
 
@@ -108,15 +108,15 @@ def convergence_et_erreur(N_spatial_list, N_temporel):
         erreurs_L1.append(erreur_L1)
         erreurs_L2.append(erreur_L2)
 
-    # RŽgression linŽaire pour ordre de convergence
+    # Rï¿½gression linï¿½aire pour ordre de convergence
     slope_L1, _, _, _, _ = linregress(np.log(dx_list), np.log(erreurs_L1))
     slope_L2, _, _, _, _ = linregress(np.log(dx_list), np.log(erreurs_L2))
 
     # Affichage
     plt.figure(figsize=(10,4))
     
-    plt.loglog(dx_list, erreurs_L1, 'o-', label=f"L1 (ordre Å {abs(slope_L1):.2f})")
-    plt.loglog(dx_list, erreurs_L2, 's-', label=f"L2 (ordre Å {abs(slope_L2):.2f})")
+    plt.loglog(dx_list, erreurs_L1, 'o-', label=f"L1 (ordre ï¿½ {abs(slope_L1):.2f})")
+    plt.loglog(dx_list, erreurs_L2, 's-', label=f"L2 (ordre ï¿½ {abs(slope_L2):.2f})")
     plt.xlabel('dx')
     plt.ylabel('Erreur')
     plt.title("Erreurs L1 et L2 spatiale")
@@ -157,15 +157,15 @@ def convergence_temporelle(N_temporel_list, N_spatial):
         erreurs_L1.append(erreur_L1)
         erreurs_L2.append(erreur_L2)
 
-    # RŽgression pour ordre de convergence
+    # Rï¿½gression pour ordre de convergence
     slope_L1, _, _, _, _ = linregress(np.log(dt_list), np.log(erreurs_L1))
     slope_L2, _, _, _, _ = linregress(np.log(dt_list), np.log(erreurs_L2))
 
     # Affichage
     plt.figure(figsize=(10,4))
 
-    plt.loglog(dt_list, erreurs_L1, 'o-', label=f"L1 (ordre Å {abs(slope_L1):.2f})")
-    plt.loglog(dt_list, erreurs_L2, 's-', label=f"L2 (ordre Å {abs(slope_L2):.2f})")
+    plt.loglog(dt_list, erreurs_L1, 'o-', label=f"L1 (ordre ï¿½ {abs(slope_L1):.2f})")
+    plt.loglog(dt_list, erreurs_L2, 's-', label=f"L2 (ordre ï¿½ {abs(slope_L2):.2f})")
     plt.xlabel('dt')
     plt.ylabel('Erreur')
     plt.title("Erreur L1 et L2 temporelle")
