@@ -61,20 +61,3 @@ def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=
         T_i_n[i] = T_i
     
     return T_i_n 
-
-
-# Lancement de la simulation
-N_spatial=100
-N_temporel=100
-T_i_n,x_i,t_i = Temperatures(N_spatial,N_temporel)
-
-# Affichage des résultats
-plt.plot(x_i,T_i_n[25],label='t=900s')
-plt.plot(x_i,T_i_n[50],label='t=1800s')
-plt.plot(x_i,T_i_n[75],label='t=2700s')
-plt.plot(x_i,T_i_n[99],label='t=3600s')
-plt.title("Simulation de diffusion thermique au travers d'un matériau isotrope")
-plt.xlabel('Position x (m)')
-plt.ylabel('Température T (K)')
-plt.legend()
-plt.show()

@@ -142,7 +142,7 @@ slope, intercept, r_value, p_value, std_err = linregress(np.log(liste_delta_t_co
 y_pred =  np.exp(intercept) * liste_delta_t_conv_asymp[:-1]**slope
 plt.plot(liste_delta_t_conv_asymp[:-1], y_pred, '--', color='red', label=f'Ordre de convergence : {slope}')
 plt.xlabel('Delta t [s]')
-plt.ylabel('Température [K]')
+plt.ylabel('Erreur')
 plt.title('Vérification de la convergence asymptotique')
 plt.legend()
 plt.xscale('log')
