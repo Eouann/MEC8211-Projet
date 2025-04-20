@@ -209,4 +209,3 @@ plot_erreur_spatial(N_temporel, T_all)
 
 N_spatial = 100  # Exemple de paramètre spatial
 plot_erreur_temporelle(N_spatial, T_all)
-
