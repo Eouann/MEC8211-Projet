@@ -8,7 +8,6 @@ d'Euler implicite.
 import numpy as np
 import matplotlib.pyplot as plt
 import config
-import Result_Comsol
 
 
 # Définition des constantes
@@ -21,20 +20,7 @@ T_x_0=config.T_x_0
 T_x_inf=config.T_x_inf
 t_max=config.t_max
 h=config.h
-T_900 = Result_Comsol.T_900
-T_1800 = Result_Comsol.T_1800
-T_2700 = Result_Comsol.T_2700
-T_3600 = Result_Comsol.T_3600
-x_diff = Result_Comsol.x_diff
 
-
-# Regroupe les arrays dans une seule matrice
-T_all = np.vstack([
-    Result_Comsol.T_900,
-    Result_Comsol.T_1800,
-    Result_Comsol.T_2700,
-    Result_Comsol.T_3600
-])
 
 # Calcul des températures pour N points
 def Temperatures(N_spatial=100,N_temporel=100,T_x_0=T_x_0,T_x_inf=T_x_inf,alpha=alpha,rho=rho,cp=cp,h=h):
